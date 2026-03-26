@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Compare</title>
+<style>
+  :root {
+    --bg: #0a0b10;
+    --surface: #13151e;
+    --surface2: #1c1f2e;
+    --surface3: #252839;
+    --border: #2a2d42;
+    --text: #e8ebf6;
+    --text-muted: #7d82a0;
+    --accent: #6c5ce7;
+    --accent2: #a29bfe;
+    --green: #00b894;
+    --orange: #fdcb6e;
+    --blue: #0984e3;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 60px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Sticky Nav */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 11, 16, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav .logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-right: 1rem;
+  }
+  .pill-group { display: flex; gap: 4px; }
+  .pill {
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .pill:hover { border-color: var(--accent); color: var(--text); }
+  .pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nav-sep { width: 1px; height: 20px; background: var(--border); }
+  .sort-sel {
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    outline: none;
+  }
+  .jump-links {
+    margin-left: auto;
+    display: flex;
+    gap: 0.25rem;
+    overflow-x: auto;
+    flex-shrink: 0;
+    scrollbar-width: none;
+  }
+  .jump-links::-webkit-scrollbar { display: none; }
+  .jump-link {
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .jump-link:hover { background: var(--surface2); color: var(--text); }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 5rem 2rem 3rem;
+    background: radial-gradient(ellipse at 50% 0%, rgba(108,92,231,0.12) 0%, transparent 60%);
+  }
+  .hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #fff, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+  .hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto; }
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 2rem;
+  }
+  .hero-stat-num {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+  .hero-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* Vehicle Sections */
+  .vehicle-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .vehicle-section:last-of-type { border-bottom: none; }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .section-year { color: var(--text-muted); font-size: 0.9rem; }
+  .section-badges { display: flex; gap: 0.5rem; align-items: center; }
+  .badge {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .badge-hev { background: rgba(0,184,148,0.15); color: var(--green); }
+  .badge-phev { background: rgba(253,203,110,0.15); color: var(--orange); }
+  .badge-bev { background: rgba(9,132,227,0.15); color: var(--blue); }
+  .badge-body { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+  .section-price {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+  }
+
+  /* Photo gallery */
+  .photo-gallery {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .photo-gallery img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    background: var(--surface2);
+    display: block;
+    transition: transform 0.4s ease;
+    cursor: zoom-in;
+  }
+  .photo-gallery img:hover { transform: scale(1.03); }
+  .photo-gallery .photo-wrap {
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    position: relative;
+  }
+  .photo-label {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.5rem;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 999px;
+    color: rgba(255,255,255,0.8);
+    pointer-events: none;
+  }
+
+  /* Specs grid */
+  .specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .spec-cell {
+    background: var(--surface);
+    padding: 1rem 1.2rem;
+  }
+  .spec-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.25rem;
+  }
+  .spec-value {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .best { color: var(--green); }
+
+  /* Control indicators */
+  .controls-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .ctrl-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-yes { background: var(--green); }
+  .dot-partial { background: var(--orange); }
+  .dot-no { background: #e17055; }
+
+  /* Highlights */
+  .highlights-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .highlights-list li {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    padding: 0.35rem 0.85rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(10px);
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: var(--radius);
+  }
+
+  /* Footer comparison table */
+  .comparison-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+  .comparison-section h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .cmp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    min-width: 1000px;
+  }
+  .cmp-table th, .cmp-table td {
+    padding: 0.65rem 0.9rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .cmp-table thead th {
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+  }
+  .cmp-table tbody tr { background: var(--surface); transition: background 0.15s; }
+  .cmp-table tbody tr:hover { background: var(--surface2); }
+  .cmp-table td:first-child { font-weight: 600; }
+
+  /* Scroll animations */
+  .vehicle-section { opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .vehicle-section.visible { opacity: 1; transform: translateY(0); }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 6rem 2rem; color: var(--text-muted); font-size: 1.1rem; display: none; }
+
+  /* Tablet */
+  @media (max-width: 768px) {
+    nav {
+      padding: 0.5rem 0.75rem;
+      gap: 0.35rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    nav .logo { margin-right: 0.25rem; font-size: 1rem; flex-shrink: 0; }
+    .nav-sep { display: none; }
+    .jump-links { display: none; }
+    .pill-group { flex-shrink: 0; }
+    .sort-sel { flex-shrink: 0; }
+    .hero { padding: 3rem 1.25rem 2rem; }
+    .hero h1 { font-size: 2rem; }
+    .hero p { font-size: 0.95rem; }
+    .hero-stats { gap: 1.5rem; }
+    .hero-stat-num { font-size: 1.5rem; }
+    .vehicle-section { padding: 2.5rem 1.25rem; }
+    .section-title { font-size: 1.5rem; }
+    .section-price { font-size: 1.75rem; }
+    .photo-gallery { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .photo-gallery img { height: 180px; }
+    .specs-grid { grid-template-columns: 1fr 1fr; }
+    .comparison-section { padding: 2.5rem 1.25rem 4rem; }
+  }
+
+  /* Mobile */
+  @media (max-width: 480px) {
+    nav {
+      padding: 0.4rem 0.75rem;
+      gap: 0.35rem;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    nav::-webkit-scrollbar { display: none; }
+    nav .logo {
+      font-size: 0.9rem;
+      margin-right: 0.25rem;
+      flex-shrink: 0;
+    }
+    .pill-group { flex-shrink: 0; }
+    .pill { padding: 0.25rem 0.6rem; font-size: 0.7rem; flex-shrink: 0; }
+    .sort-sel { flex-shrink: 0; font-size: 0.7rem; }
+
+    .hero { padding: 2.5rem 1rem 1.75rem; }
+    .hero h1 { font-size: 1.65rem; line-height: 1.2; }
+    .hero p { font-size: 0.85rem; }
+    .hero-stats { gap: 1.25rem; margin-top: 1.5rem; }
+    .hero-stat-num { font-size: 1.3rem; }
+    .hero-stat-label { font-size: 0.65rem; }
+
+    .vehicle-section { padding: 2rem 1rem; }
+    .section-header { gap: 0.5rem; margin-bottom: 1.25rem; }
+    .section-title { font-size: 1.35rem; }
+    .section-year { font-size: 0.8rem; }
+    .section-price { font-size: 1.6rem; }
+    .section-badges { gap: 0.35rem; }
+    .badge { font-size: 0.6rem; padding: 0.2rem 0.6rem; }
+
+    .photo-gallery {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1.75rem;
+    }
+    .photo-gallery .photo-wrap { border-radius: var(--radius-sm); }
+    .photo-gallery img { height: 200px; }
+
+    .specs-grid {
+      grid-template-columns: 1fr 1fr;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+    }
+    .spec-cell { padding: 0.75rem 0.9rem; }
+    .spec-label { font-size: 0.6rem; }
+    .spec-value { font-size: 0.88rem; }
+
+    .controls-row { gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .ctrl-chip { font-size: 0.72rem; padding: 0.3rem 0.7rem; }
+    .dot { width: 7px; height: 7px; }
+
+    .highlights-list { gap: 0.4rem; }
+    .highlights-list li { font-size: 0.75rem; padding: 0.3rem 0.7rem; }
+
+    .comparison-section { padding: 2rem 1rem 3rem; }
+    .comparison-section h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+
+    .lightbox img { max-width: 95vw; max-height: 85vh; border-radius: var(--radius-sm); }
+  }
+
+  /* Very small screens */
+  @media (max-width: 360px) {
+    nav .logo { font-size: 0.85rem; }
+    .pill { padding: 0.2rem 0.5rem; font-size: 0.65rem; }
+    .hero h1 { font-size: 1.4rem; }
+    .section-title { font-size: 1.2rem; }
+    .section-price { font-size: 1.4rem; }
+    .photo-gallery img { height: 170px; }
+    .spec-cell { padding: 0.6rem 0.7rem; }
+    .spec-value { font-size: 0.82rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">CarCompare</span>
+  <div class="pill-group" id="typeFilters">
+    <button class="pill active" data-filter="all">All</button>
+    <button class="pill" data-filter="HEV">Hybrid</button>
+    <button class="pill" data-filter="PHEV">PHEV</button>
+    <button class="pill" data-filter="BEV">BEV</button>
+  </div>
+  <div class="nav-sep"></div>
+  <div class="pill-group" id="bodyFilters">
+    <button class="pill active" data-filter="all">All</button>
+    <button class="pill" data-filter="Sedan">Sedan</button>
+    <button class="pill" data-filter="Compact SUV">SUV</button>
+    <button class="pill" data-filter="Crossover">Crossover</button>
+  </div>
+  <div class="nav-sep"></div>
+  <select class="sort-sel" id="sortSelect">
+    <option value="msrp-asc">Price: Low &rarr; High</option>
+    <option value="msrp-desc">Price: High &rarr; Low</option>
+    <option value="mpg-desc">Efficiency: Best First</option>
+    <option value="range-desc">EV Range: Most First</option>
+    <option value="hp-desc">Power: Most First</option>
+    <option value="cargo-desc">Cargo: Most First</option>
+  </select>
+  <div class="jump-links" id="jumpLinks"></div>
+</nav>
+
+<div class="hero">
+  <h1>Find Your Next Car</h1>
+  <p>Comparing 9 hybrid, plug-in hybrid, and battery electric vehicles side by side.</p>
+  <div class="hero-stats">
+    <div><div class="hero-stat-num">9</div><div class="hero-stat-label">Vehicles</div></div>
+    <div><div class="hero-stat-num">3</div><div class="hero-stat-label">Powertrains</div></div>
+    <div><div class="hero-stat-num">$28K–$61K</div><div class="hero-stat-label">Price Range</div></div>
+  </div>
+</div>
+
+<div id="vehicleList"></div>
+<div class="empty-state" id="emptyState">No vehicles match the current filters.</div>
+
+<div class="comparison-section" id="compSection">
+  <h2>Side-by-Side Comparison</h2>
+  <div class="table-wrap">
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>Vehicle</th><th>Type</th><th>Body</th><th>MSRP</th><th>Efficiency</th>
+          <th>EV Range</th><th>HP</th><th>Drive</th><th>Screen</th>
+          <th>A/C Ctrl</th><th>Vol Ctrl</th><th>Cargo</th>
+        </tr>
+      </thead>
+      <tbody id="cmpBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <img id="lightboxImg" src="" alt="Enlarged photo" />
+</div>
+
+<script>
+const vehicles = [
+  {
+    id: "accord", name: "Honda Accord Hybrid", year: 2025, body: "Sedan", type: "HEV",
+    msrp: 28295, mpg: 46, mpgLabel: "44–48 MPG", range: null,
+    hp: 204, hpLabel: "204", drive: "FWD",
+    screen: 12.3, screenLabel: '12.3"', acControl: "yes", volControl: "yes",
+    trunk: "Traditional trunk", cargo: 16.7, seating: 5,
+    highlights: ["Up to 48 MPG combined (EX-L)", "Google Built-in infotainment", "Honda Sensing safety suite standard"],
+    images: {
+      front: "https://media.ed.edmunds-media.com/honda/accord/2025/oem/2025_honda_accord_sedan_sport-l-hybrid_fq_oem_1_1280.jpg",
+      rear: "https://media.ed.edmunds-media.com/honda/accord/2025/oem/2025_honda_accord_sedan_sport-l-hybrid_rq_oem_1_1280.jpg",
+      side: "https://media.ed.edmunds-media.com/honda/accord/2025/oem/2025_honda_accord_sedan_se_s_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/honda/accord/2025/oem/2025_honda_accord_sedan_touring-hybrid_d_oem_1_1280.jpg"
+    }
+  },
+  {
+    id: "crv", name: "Honda CR-V Hybrid", year: 2025, body: "Compact SUV", type: "HEV",
+    msrp: 36045, mpg: 38.5, mpgLabel: "37–40 MPG", range: null,
+    hp: 204, hpLabel: "204", drive: "FWD / AWD",
+    screen: 9, screenLabel: '7–9"', acControl: "yes", volControl: "yes",
+    trunk: "Liftgate", cargo: 39.3, seating: 5,
+    highlights: ["39.3 cu ft cargo behind 2nd row", "AWD with torque vectoring", "Physical controls throughout"],
+    images: {
+      front: "https://media.ed.edmunds-media.com/honda/cr-v/2025/oem/2025_honda_cr-v_4dr-suv_ex-l_fq_oem_1_1280.jpg",
+      rear: "https://media.ed.edmunds-media.com/honda/cr-v/2025/oem/2025_honda_cr-v_4dr-suv_ex-l_rq_oem_1_1280.jpg",
+      side: "https://media.ed.edmunds-media.com/honda/cr-v/2025/oem/2025_honda_cr-v_4dr-suv_ex-l_s_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/honda/cr-v/2025/oem/2025_honda_cr-v_4dr-suv_sport-touring-hybrid_d_oem_1_1280.jpg"
+    }
+  },
+  {
+    id: "ev6", name: "Kia EV6", year: 2026, body: "Crossover", type: "BEV",
+    msrp: 42600, mpg: 115, mpgLabel: "115 MPGe", range: 319,
+    hp: 320, hpLabel: "167–320", drive: "RWD / AWD",
+    screen: 12.3, screenLabel: '12.3"', acControl: "no", volControl: "partial",
+    trunk: "Liftgate + frunk (some)", cargo: 24.4, seating: 5,
+    highlights: ["800V ultra-fast charging (10–80% ~18 min)", "Vehicle-to-Load (V2L)", "US-assembled in Georgia"],
+    images: {
+      front: "https://media.ed.edmunds-media.com/kia/ev6/2025/oem/2025_kia_ev6_4dr-suv_gt-line_fq_oem_1_1280.jpg",
+      rear: "https://media.ed.edmunds-media.com/kia/ev6/2025/oem/2025_kia_ev6_4dr-suv_gt-line_rq_oem_1_1280.jpg",
+      side: "https://media.ed.edmunds-media.com/kia/ev6/2025/oem/2025_kia_ev6_4dr-suv_gt-line_s_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/kia/ev6/2025/oem/2025_kia_ev6_4dr-suv_gt-line_d_oem_1_1280.jpg"
+    }
+  },
+  {
+    id: "ioniq5", name: "Hyundai Ioniq 5", year: 2026, body: "Compact SUV", type: "BEV",
+    msrp: 35000, mpg: 115, mpgLabel: "115 MPGe", range: 318,
+    hp: 320, hpLabel: "168–320", drive: "RWD / AWD",
+    screen: 12.3, screenLabel: '12.3"', acControl: "partial", volControl: "yes",
+    trunk: "Liftgate + frunk", cargo: 26.3, seating: 5,
+    highlights: ["800V ultra-fast charging", "2026 price cuts up to $9,800", "V2L + flat-folding front seats"],
+    images: {
+      front: "https://media.ed.edmunds-media.com/hyundai/ioniq-5/2026/oem/2026_hyundai_ioniq-5_4dr-suv_limited_fq_oem_1_1280.jpg",
+      rear: "https://media.ed.edmunds-media.com/hyundai/ioniq-5/2026/oem/2026_hyundai_ioniq-5_4dr-suv_limited_rq_oem_1_1280.jpg",
+      side: "https://media.ed.edmunds-media.com/hyundai/ioniq-5/2026/oem/2026_hyundai_ioniq-5_4dr-suv_limited_life1_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/hyundai/ioniq-5/2026/oem/2026_hyundai_ioniq-5_4dr-suv_limited_i_oem_1_1280.jpg"
+    }
+  },
+  {
+    id: "ioniq6", name: "Hyundai Ioniq 6", year: 2026, body: "Sedan", type: "BEV",
+    msrp: 40000, mpg: 135, mpgLabel: "135 MPGe", range: 342,
+    hp: 320, hpLabel: "149–320", drive: "RWD / AWD",
+    screen: 12.3, screenLabel: '12.3"', acControl: "yes", volControl: "yes",
+    trunk: "Trunk + tiny frunk", cargo: 11.2, seating: 5,
+    highlights: ["Best-in-class 135 MPGe (0.21 Cd)", "342-mile max range (LR RWD)", "2026 facelift"],
+    images: {
+      front: "https://media.ed.edmunds-media.com/hyundai/ioniq-6/2025/oem/2025_hyundai_ioniq-6_sedan_limited_fq_oem_1_1280.jpg",
+      rear: "https://media.ed.edmunds-media.com/hyundai/ioniq-6/2025/oem/2025_hyundai_ioniq-6_sedan_limited_rq_oem_1_1280.jpg",
+      side: "https://media.ed.edmunds-media.com/hyundai/ioniq-6/2025/oem/2025_hyundai_ioniq-6_sedan_limited_s_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/hyundai/ioniq-6/2025/oem/2025_hyundai_ioniq-6_sedan_limited_i_oem_1_1280.jpg"
+    }
+  },
+  {
+    id: "nx350h", name: "Lexus NX 350h", year: 2025, body: "Compact SUV", type: "HEV",
+    msrp: 45425, mpg: 39, mpgLabel: "39 MPG", range: null,
+    hp: 240, hpLabel: "240", drive: "FWD / AWD",
+    screen: 14, screenLabel: '9.8–14"', acControl: "yes", volControl: "yes",
+    trunk: "Power liftgate", cargo: 22.7, seating: 5,
+    highlights: ["39 MPG for a luxury SUV", "Lexus Safety System+ 3.0", "Wireless CarPlay / Android Auto"],
+    images: {
+      front: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_fq_oem_1_1280.jpg",
+      rear: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_rq_oem_1_1280.jpg",
+      side: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_s_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_350h-luxury_d_oem_1_1280.jpg"
+    }
+  },
+  {
+    id: "nx450h", name: "Lexus NX 450h+", year: 2025, body: "Compact SUV", type: "PHEV",
+    msrp: 61240, mpg: 84, mpgLabel: "84 MPGe / 36 MPG", range: 37,
+    hp: 302, hpLabel: "302", drive: "AWD",
+    screen: 14, screenLabel: '14"', acControl: "partial", volControl: "yes",
+    trunk: "Power liftgate", cargo: 22.7, seating: 5,
+    highlights: ["37-mile EV range for commutes", "Level 2 full charge ~2.5 hrs", "Most powerful NX at 302 hp"],
+    images: {
+      front: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_fq_oem_1_1280.jpg",
+      rear: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_rq_oem_1_1280.jpg",
+      side: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_s_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_350-f-sport-handling_d_oem_1_1280.jpg"
+    }
+  },
+  {
+    id: "es350h", name: "Lexus ES 350h", year: 2026, body: "Sedan", type: "HEV",
+    msrp: 50995, mpg: 44, mpgLabel: "~44 MPG (est.)", range: null,
+    hp: 243, hpLabel: "243", drive: "FWD / AWD",
+    screen: 14, screenLabel: '14"', acControl: "partial", volControl: "yes",
+    trunk: "Traditional trunk", cargo: 15, seating: 5,
+    highlights: ["First-ever AWD on ES hybrid", "243 hp (6th-gen hybrid)", "Lexus Safety System+ 4.0"],
+    images: {
+      front: "https://pressroom.lexus.com/wp-content/uploads/2025/04/Lexus_ES500e_Luxury_HERO-1500x900.jpg",
+      side: "https://pressroom.lexus.com/wp-content/uploads/2025/04/Lexus_ES500e_Luxury_02-1000x600.jpg",
+      rear: "https://pressroom.lexus.com/wp-content/uploads/2025/04/Lexus_ES500e_Luxury_03-1000x600.jpg",
+      interior: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_013-1000x600.jpg"
+    }
+  },
+  {
+    id: "es350e", name: "Lexus ES 350e", year: 2026, body: "Sedan", type: "BEV",
+    msrp: 48795, mpg: 125, mpgLabel: "~125 MPGe (est.)", range: 307,
+    hp: 338, hpLabel: "221–338", drive: "FWD / AWD",
+    screen: 14, screenLabel: '14"', acControl: "partial", volControl: "yes",
+    trunk: "Traditional trunk", cargo: 14, seating: 5,
+    highlights: ["307-mile range under $49K", "DIRECT4 AWD (ES 500e, 338 hp)", "OTA updates + dual Bluetooth"],
+    images: {
+      front: "https://pressroom.lexus.com/wp-content/uploads/2025/04/Lexus_ES500e_Luxury_01-1000x600.jpg",
+      side: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_04-1000x600.jpg",
+      rear: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_06-1000x600.jpg",
+      interior: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_014-1000x600.jpg"
+    }
+  }
+];
+
+// State
+let typeFilter = "all";
+let bodyFilter = "all";
+let sortKey = "msrp-asc";
+
+const fmt = n => "$" + n.toLocaleString("en-US");
+
+function badgeClass(t) { return t === "HEV" ? "badge-hev" : t === "PHEV" ? "badge-phev" : "badge-bev"; }
+function typeLabel(t) { return t === "HEV" ? "Hybrid" : t; }
+function ctrlDot(v) {
+  if (v === "yes") return `<span class="dot dot-yes"></span> Yes`;
+  if (v === "partial") return `<span class="dot dot-partial"></span> Partial`;
+  return `<span class="dot dot-no"></span> No`;
+}
+
+function getList() {
+  let list = vehicles.filter(v => {
+    return (typeFilter === "all" || v.type === typeFilter) &&
+           (bodyFilter === "all" || v.body === bodyFilter);
+  });
+  const [f, d] = sortKey.split("-");
+  const m = d === "asc" ? 1 : -1;
+  list.sort((a, b) => {
+    let va, vb;
+    switch(f) {
+      case "msrp": va=a.msrp; vb=b.msrp; break;
+      case "mpg": va=a.mpg; vb=b.mpg; break;
+      case "range": va=a.range||0; vb=b.range||0; break;
+      case "hp": va=a.hp; vb=b.hp; break;
+      case "cargo": va=a.cargo; vb=b.cargo; break;
+      default: va=a.name; vb=b.name;
+    }
+    return va < vb ? -1*m : va > vb ? 1*m : 0;
+  });
+  return list;
+}
+
+function getBests(list) {
+  if (!list.length) return {};
+  return {
+    lowestMsrp: Math.min(...list.map(v=>v.msrp)),
+    bestMpg: Math.max(...list.map(v=>v.mpg)),
+    bestRange: Math.max(...list.map(v=>v.range||0)),
+    bestHp: Math.max(...list.map(v=>v.hp)),
+    bestCargo: Math.max(...list.map(v=>v.cargo))
+  };
+}
+
+function render() {
+  const list = getList();
+  const b = getBests(list);
+  const container = document.getElementById("vehicleList");
+  const empty = document.getElementById("emptyState");
+  const compSection = document.getElementById("compSection");
+
+  if (!list.length) {
+    container.innerHTML = "";
+    empty.style.display = "block";
+    compSection.style.display = "none";
+    return;
+  }
+  empty.style.display = "none";
+  compSection.style.display = "block";
+
+  // Jump links
+  document.getElementById("jumpLinks").innerHTML = list.map(v =>
+    `<a class="jump-link" href="#${v.id}">${v.name.split(" ").slice(-1)[0] === "Hybrid" ? v.name.split(" ").slice(0,-1).join(" ") : v.name}</a>`
+  ).join("");
+
+  // Vehicle sections
+  container.innerHTML = list.map(v => `
+    <section class="vehicle-section" id="${v.id}">
+      <div class="section-header">
+        <div>
+          <div class="section-title">${v.name}</div>
+          <div class="section-year">${v.year} &middot; ${v.body}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="section-price ${v.msrp===b.lowestMsrp?'best':''}">${fmt(v.msrp)}</div>
+          <div class="section-badges">
+            <span class="badge ${badgeClass(v.type)}">${typeLabel(v.type)}</span>
+            <span class="badge badge-body">${v.body}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-gallery">
+        <div class="photo-wrap"><img src="${v.images.front}" alt="${v.name} front" loading="lazy" onclick="openLightbox(this.src)"><span class="photo-label">Front</span></div>
+        <div class="photo-wrap"><img src="${v.images.side}" alt="${v.name} side" loading="lazy" onclick="openLightbox(this.src)"><span class="photo-label">Side</span></div>
+        <div class="photo-wrap"><img src="${v.images.rear}" alt="${v.name} rear" loading="lazy" onclick="openLightbox(this.src)"><span class="photo-label">Rear</span></div>
+        <div class="photo-wrap"><img src="${v.images.interior}" alt="${v.name} interior" loading="lazy" onclick="openLightbox(this.src)"><span class="photo-label">Interior</span></div>
+      </div>
+
+      <div class="specs-grid">
+        <div class="spec-cell"><div class="spec-label">Efficiency</div><div class="spec-value ${v.mpg===b.bestMpg?'best':''}">${v.mpgLabel}</div></div>
+        <div class="spec-cell"><div class="spec-label">EV Range</div><div class="spec-value ${(v.range||0)===b.bestRange&&v.range?'best':''}">${v.range ? v.range+' mi' : '—'}</div></div>
+        <div class="spec-cell"><div class="spec-label">Horsepower</div><div class="spec-value ${v.hp===b.bestHp?'best':''}">${v.hpLabel} hp</div></div>
+        <div class="spec-cell"><div class="spec-label">Drivetrain</div><div class="spec-value">${v.drive}</div></div>
+        <div class="spec-cell"><div class="spec-label">Screen</div><div class="spec-value">${v.screenLabel}</div></div>
+        <div class="spec-cell"><div class="spec-label">Trunk</div><div class="spec-value">${v.trunk}</div></div>
+        <div class="spec-cell"><div class="spec-label">Cargo</div><div class="spec-value ${v.cargo===b.bestCargo?'best':''}">${v.cargo} cu ft</div></div>
+        <div class="spec-cell"><div class="spec-label">Seating</div><div class="spec-value">${v.seating}</div></div>
+      </div>
+
+      <div class="controls-row">
+        <span class="ctrl-chip">${ctrlDot(v.acControl)} A/C Controls</span>
+        <span class="ctrl-chip">${ctrlDot(v.volControl)} Volume Controls</span>
+      </div>
+
+      <ul class="highlights-list">
+        ${v.highlights.map(h=>`<li>${h}</li>`).join("")}
+      </ul>
+    </section>
+  `).join("");
+
+  // Comparison table
+  document.getElementById("cmpBody").innerHTML = list.map(v => `
+    <tr>
+      <td>${v.name} <small style="color:var(--text-muted)">${v.year}</small></td>
+      <td><span class="badge ${badgeClass(v.type)}">${typeLabel(v.type)}</span></td>
+      <td>${v.body}</td>
+      <td class="${v.msrp===b.lowestMsrp?'best':''}">${fmt(v.msrp)}</td>
+      <td class="${v.mpg===b.bestMpg?'best':''}">${v.mpgLabel}</td>
+      <td class="${(v.range||0)===b.bestRange&&v.range?'best':''}">${v.range?v.range+' mi':'—'}</td>
+      <td class="${v.hp===b.bestHp?'best':''}">${v.hpLabel} hp</td>
+      <td>${v.drive}</td>
+      <td>${v.screenLabel}</td>
+      <td>${v.acControl}</td>
+      <td>${v.volControl}</td>
+      <td class="${v.cargo===b.bestCargo?'best':''}">${v.cargo} cu ft</td>
+    </tr>
+  `).join("");
+
+  // Trigger scroll animations
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.vehicle-section').forEach(el => observer.observe(el));
+  });
+}
+
+// Scroll-in observer
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+
+// Lightbox
+function openLightbox(src) {
+  document.getElementById("lightboxImg").src = src;
+  document.getElementById("lightbox").classList.add("open");
+}
+document.getElementById("lightbox").addEventListener("click", () => {
+  document.getElementById("lightbox").classList.remove("open");
+});
+
+// Events
+document.getElementById("typeFilters").addEventListener("click", e => {
+  if (!e.target.classList.contains("pill")) return;
+  document.querySelectorAll("#typeFilters .pill").forEach(b=>b.classList.remove("active"));
+  e.target.classList.add("active");
+  typeFilter = e.target.dataset.filter;
+  render();
+});
+document.getElementById("bodyFilters").addEventListener("click", e => {
+  if (!e.target.classList.contains("pill")) return;
+  document.querySelectorAll("#bodyFilters .pill").forEach(b=>b.classList.remove("active"));
+  e.target.classList.add("active");
+  bodyFilter = e.target.dataset.filter;
+  render();
+});
+document.getElementById("sortSelect").addEventListener("change", e => {
+  sortKey = e.target.value;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
