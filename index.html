@@ -226,10 +226,17 @@
   .photo-gallery {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
     gap: 0.75rem;
     margin-bottom: 2.5rem;
     border-radius: var(--radius);
     overflow: hidden;
+  }
+  .photo-gallery .photo-wrap:last-child {
+    grid-column: 1 / -1;
+  }
+  .photo-gallery .photo-wrap:last-child img {
+    height: 280px;
   }
   .photo-gallery img {
     width: 100%;
@@ -389,6 +396,34 @@
   .cmp-table tbody tr:hover { background: var(--surface2); }
   .cmp-table td:first-child { font-weight: 600; }
 
+  /* Manufacturer link */
+  .mfg-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    padding: 0.6rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--accent2);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .mfg-link:hover {
+    border-color: var(--accent);
+    background: rgba(108,92,231,0.1);
+    color: #fff;
+  }
+  .mfg-link svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
   /* Scroll animations */
   .vehicle-section { opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .vehicle-section.visible { opacity: 1; transform: translateY(0); }
@@ -419,6 +454,7 @@
     .section-price { font-size: 1.75rem; }
     .photo-gallery { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
     .photo-gallery img { height: 180px; }
+    .photo-gallery .photo-wrap:last-child img { height: 200px; }
     .specs-grid { grid-template-columns: 1fr 1fr; }
     .comparison-section { padding: 2.5rem 1.25rem 4rem; }
   }
@@ -464,7 +500,9 @@
       margin-bottom: 1.75rem;
     }
     .photo-gallery .photo-wrap { border-radius: var(--radius-sm); }
+    .photo-gallery .photo-wrap:last-child { grid-column: 1; }
     .photo-gallery img { height: 200px; }
+    .photo-gallery .photo-wrap:last-child img { height: 200px; }
 
     .specs-grid {
       grid-template-columns: 1fr 1fr;
@@ -520,7 +558,8 @@
   <div class="pill-group" id="bodyFilters">
     <button class="pill active" data-filter="all">All</button>
     <button class="pill" data-filter="Sedan">Sedan</button>
-    <button class="pill" data-filter="Compact SUV">SUV</button>
+    <button class="pill" data-filter="Compact SUV">Compact SUV</button>
+    <button class="pill" data-filter="SUV">SUV</button>
     <button class="pill" data-filter="Crossover">Crossover</button>
   </div>
   <div class="nav-sep"></div>
@@ -537,11 +576,11 @@
 
 <div class="hero">
   <h1>Find Your Next Car</h1>
-  <p>Comparing 9 hybrid, plug-in hybrid, and battery electric vehicles side by side.</p>
+  <p>Comparing 11 hybrid, plug-in hybrid, and battery electric vehicles side by side.</p>
   <div class="hero-stats">
-    <div><div class="hero-stat-num">9</div><div class="hero-stat-label">Vehicles</div></div>
+    <div><div class="hero-stat-num">11</div><div class="hero-stat-label">Vehicles</div></div>
     <div><div class="hero-stat-num">3</div><div class="hero-stat-label">Powertrains</div></div>
-    <div><div class="hero-stat-num">$28K–$61K</div><div class="hero-stat-label">Price Range</div></div>
+    <div><div class="hero-stat-num">$28K–$73K</div><div class="hero-stat-label">Price Range</div></div>
   </div>
 </div>
 
@@ -577,11 +616,13 @@ const vehicles = [
     screen: 12.3, screenLabel: '12.3"', acControl: "yes", volControl: "yes",
     trunk: "Traditional trunk", cargo: 16.7, seating: 5,
     highlights: ["Up to 48 MPG combined (EX-L)", "Google Built-in infotainment", "Honda Sensing safety suite standard"],
+    mfgUrl: "https://automobiles.honda.com/2025/accord-sedan",
     images: {
       front: "https://media.ed.edmunds-media.com/honda/accord/2025/oem/2025_honda_accord_sedan_sport-l-hybrid_fq_oem_1_1280.jpg",
-      rear: "https://media.ed.edmunds-media.com/honda/accord/2025/oem/2025_honda_accord_sedan_sport-l-hybrid_rq_oem_1_1280.jpg",
       side: "https://media.ed.edmunds-media.com/honda/accord/2025/oem/2025_honda_accord_sedan_se_s_oem_1_1280.jpg",
-      interior: "https://media.ed.edmunds-media.com/honda/accord/2025/oem/2025_honda_accord_sedan_touring-hybrid_d_oem_1_1280.jpg"
+      rear: "https://media.ed.edmunds-media.com/honda/accord/2025/oem/2025_honda_accord_sedan_sport-l-hybrid_rq_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/honda/accord/2025/oem/2025_honda_accord_sedan_touring-hybrid_d_oem_2_1280.jpg",
+      cockpit: "https://media.ed.edmunds-media.com/honda/accord/2025/oem/2025_honda_accord_sedan_touring-hybrid_d_oem_1_1280.jpg"
     }
   },
   {
@@ -591,11 +632,13 @@ const vehicles = [
     screen: 9, screenLabel: '7–9"', acControl: "yes", volControl: "yes",
     trunk: "Liftgate", cargo: 39.3, seating: 5,
     highlights: ["39.3 cu ft cargo behind 2nd row", "AWD with torque vectoring", "Physical controls throughout"],
+    mfgUrl: "https://automobiles.honda.com/cr-v",
     images: {
       front: "https://media.ed.edmunds-media.com/honda/cr-v/2025/oem/2025_honda_cr-v_4dr-suv_ex-l_fq_oem_1_1280.jpg",
-      rear: "https://media.ed.edmunds-media.com/honda/cr-v/2025/oem/2025_honda_cr-v_4dr-suv_ex-l_rq_oem_1_1280.jpg",
       side: "https://media.ed.edmunds-media.com/honda/cr-v/2025/oem/2025_honda_cr-v_4dr-suv_ex-l_s_oem_1_1280.jpg",
-      interior: "https://media.ed.edmunds-media.com/honda/cr-v/2025/oem/2025_honda_cr-v_4dr-suv_sport-touring-hybrid_d_oem_1_1280.jpg"
+      rear: "https://media.ed.edmunds-media.com/honda/cr-v/2025/oem/2025_honda_cr-v_4dr-suv_ex-l_rq_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/honda/cr-v/2025/oem/2025_honda_cr-v_4dr-suv_sport-touring-hybrid_d_oem_2_1280.jpg",
+      cockpit: "https://media.ed.edmunds-media.com/honda/cr-v/2025/oem/2025_honda_cr-v_4dr-suv_sport-touring-hybrid_d_oem_1_1280.jpg"
     }
   },
   {
@@ -605,11 +648,13 @@ const vehicles = [
     screen: 12.3, screenLabel: '12.3"', acControl: "no", volControl: "partial",
     trunk: "Liftgate + frunk (some)", cargo: 24.4, seating: 5,
     highlights: ["800V ultra-fast charging (10–80% ~18 min)", "Vehicle-to-Load (V2L)", "US-assembled in Georgia"],
+    mfgUrl: "https://www.kia.com/us/en/ev6",
     images: {
       front: "https://media.ed.edmunds-media.com/kia/ev6/2025/oem/2025_kia_ev6_4dr-suv_gt-line_fq_oem_1_1280.jpg",
-      rear: "https://media.ed.edmunds-media.com/kia/ev6/2025/oem/2025_kia_ev6_4dr-suv_gt-line_rq_oem_1_1280.jpg",
       side: "https://media.ed.edmunds-media.com/kia/ev6/2025/oem/2025_kia_ev6_4dr-suv_gt-line_s_oem_1_1280.jpg",
-      interior: "https://media.ed.edmunds-media.com/kia/ev6/2025/oem/2025_kia_ev6_4dr-suv_gt-line_d_oem_1_1280.jpg"
+      rear: "https://media.ed.edmunds-media.com/kia/ev6/2025/oem/2025_kia_ev6_4dr-suv_gt-line_rq_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/kia/ev6/2025/oem/2025_kia_ev6_4dr-suv_gt-line_d_oem_2_1280.jpg",
+      cockpit: "https://media.ed.edmunds-media.com/kia/ev6/2025/oem/2025_kia_ev6_4dr-suv_gt-line_d_oem_1_1280.jpg"
     }
   },
   {
@@ -619,11 +664,13 @@ const vehicles = [
     screen: 12.3, screenLabel: '12.3"', acControl: "partial", volControl: "yes",
     trunk: "Liftgate + frunk", cargo: 26.3, seating: 5,
     highlights: ["800V ultra-fast charging", "2026 price cuts up to $9,800", "V2L + flat-folding front seats"],
+    mfgUrl: "https://www.hyundaiusa.com/us/en/vehicles/ioniq-5",
     images: {
       front: "https://media.ed.edmunds-media.com/hyundai/ioniq-5/2026/oem/2026_hyundai_ioniq-5_4dr-suv_limited_fq_oem_1_1280.jpg",
-      rear: "https://media.ed.edmunds-media.com/hyundai/ioniq-5/2026/oem/2026_hyundai_ioniq-5_4dr-suv_limited_rq_oem_1_1280.jpg",
       side: "https://media.ed.edmunds-media.com/hyundai/ioniq-5/2026/oem/2026_hyundai_ioniq-5_4dr-suv_limited_life1_oem_1_1280.jpg",
-      interior: "https://media.ed.edmunds-media.com/hyundai/ioniq-5/2026/oem/2026_hyundai_ioniq-5_4dr-suv_limited_i_oem_1_1280.jpg"
+      rear: "https://media.ed.edmunds-media.com/hyundai/ioniq-5/2026/oem/2026_hyundai_ioniq-5_4dr-suv_limited_rq_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/hyundai/ioniq-5/2026/oem/2026_hyundai_ioniq-5_4dr-suv_limited_i_oem_1_1280.jpg",
+      cockpit: "https://media.ed.edmunds-media.com/hyundai/ioniq-5/2026/oem/2026_hyundai_ioniq-5_4dr-suv_limited_d_oem_1_1280.jpg"
     }
   },
   {
@@ -633,11 +680,13 @@ const vehicles = [
     screen: 12.3, screenLabel: '12.3"', acControl: "yes", volControl: "yes",
     trunk: "Trunk + tiny frunk", cargo: 11.2, seating: 5,
     highlights: ["Best-in-class 135 MPGe (0.21 Cd)", "342-mile max range (LR RWD)", "2026 facelift"],
+    mfgUrl: "https://www.hyundaiusa.com/us/en/vehicles/ioniq-6",
     images: {
       front: "https://media.ed.edmunds-media.com/hyundai/ioniq-6/2025/oem/2025_hyundai_ioniq-6_sedan_limited_fq_oem_1_1280.jpg",
-      rear: "https://media.ed.edmunds-media.com/hyundai/ioniq-6/2025/oem/2025_hyundai_ioniq-6_sedan_limited_rq_oem_1_1280.jpg",
       side: "https://media.ed.edmunds-media.com/hyundai/ioniq-6/2025/oem/2025_hyundai_ioniq-6_sedan_limited_s_oem_1_1280.jpg",
-      interior: "https://media.ed.edmunds-media.com/hyundai/ioniq-6/2025/oem/2025_hyundai_ioniq-6_sedan_limited_i_oem_1_1280.jpg"
+      rear: "https://media.ed.edmunds-media.com/hyundai/ioniq-6/2025/oem/2025_hyundai_ioniq-6_sedan_limited_rq_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/hyundai/ioniq-6/2025/oem/2025_hyundai_ioniq-6_sedan_limited_i_oem_1_1280.jpg",
+      cockpit: "https://media.ed.edmunds-media.com/hyundai/ioniq-6/2025/oem/2025_hyundai_ioniq-6_sedan_limited_d_oem_1_1280.jpg"
     }
   },
   {
@@ -647,11 +696,13 @@ const vehicles = [
     screen: 14, screenLabel: '9.8–14"', acControl: "yes", volControl: "yes",
     trunk: "Power liftgate", cargo: 22.7, seating: 5,
     highlights: ["39 MPG for a luxury SUV", "Lexus Safety System+ 3.0", "Wireless CarPlay / Android Auto"],
+    mfgUrl: "https://www.lexus.com/models/NX-hybrid",
     images: {
       front: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_fq_oem_1_1280.jpg",
-      rear: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_rq_oem_1_1280.jpg",
       side: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_s_oem_1_1280.jpg",
-      interior: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_350h-luxury_d_oem_1_1280.jpg"
+      rear: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_rq_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_350h-luxury_d_oem_2_1280.jpg",
+      cockpit: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_350h-luxury_d_oem_1_1280.jpg"
     }
   },
   {
@@ -661,11 +712,13 @@ const vehicles = [
     screen: 14, screenLabel: '14"', acControl: "partial", volControl: "yes",
     trunk: "Power liftgate", cargo: 22.7, seating: 5,
     highlights: ["37-mile EV range for commutes", "Level 2 full charge ~2.5 hrs", "Most powerful NX at 302 hp"],
+    mfgUrl: "https://www.lexus.com/models/NX-PHEV",
     images: {
       front: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_fq_oem_1_1280.jpg",
-      rear: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_rq_oem_1_1280.jpg",
       side: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_s_oem_1_1280.jpg",
-      interior: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_350-f-sport-handling_d_oem_1_1280.jpg"
+      rear: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_250-premium_rq_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_350-f-sport-handling_d_oem_2_1280.jpg",
+      cockpit: "https://media.ed.edmunds-media.com/lexus/nx/2025/oem/2025_lexus_nx_4dr-suv_350-f-sport-handling_d_oem_1_1280.jpg"
     }
   },
   {
@@ -675,11 +728,13 @@ const vehicles = [
     screen: 14, screenLabel: '14"', acControl: "partial", volControl: "yes",
     trunk: "Traditional trunk", cargo: 15, seating: 5,
     highlights: ["First-ever AWD on ES hybrid", "243 hp (6th-gen hybrid)", "Lexus Safety System+ 4.0"],
+    mfgUrl: "https://www.lexus.com/models/ES",
     images: {
-      front: "https://pressroom.lexus.com/wp-content/uploads/2025/04/Lexus_ES500e_Luxury_HERO-1500x900.jpg",
-      side: "https://pressroom.lexus.com/wp-content/uploads/2025/04/Lexus_ES500e_Luxury_02-1000x600.jpg",
-      rear: "https://pressroom.lexus.com/wp-content/uploads/2025/04/Lexus_ES500e_Luxury_03-1000x600.jpg",
-      interior: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_013-1000x600.jpg"
+      front: "https://pressroom.lexus.com/wp-content/uploads/2025/04/Lexus_ES500e_Luxury_02-1000x600.jpg",
+      side: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_04-1000x600.jpg",
+      rear: "https://pressroom.lexus.com/wp-content/uploads/2025/04/Lexus_ES500e_Luxury_01-1000x600.jpg",
+      interior: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_016-1000x600.jpg",
+      cockpit: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_013-1000x600.jpg"
     }
   },
   {
@@ -689,11 +744,45 @@ const vehicles = [
     screen: 14, screenLabel: '14"', acControl: "partial", volControl: "yes",
     trunk: "Traditional trunk", cargo: 14, seating: 5,
     highlights: ["307-mile range under $49K", "DIRECT4 AWD (ES 500e, 338 hp)", "OTA updates + dual Bluetooth"],
+    mfgUrl: "https://www.lexus.com/models/ES",
     images: {
-      front: "https://pressroom.lexus.com/wp-content/uploads/2025/04/Lexus_ES500e_Luxury_01-1000x600.jpg",
-      side: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_04-1000x600.jpg",
-      rear: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_06-1000x600.jpg",
-      interior: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_014-1000x600.jpg"
+      front: "https://pressroom.lexus.com/wp-content/uploads/2025/04/Lexus_ES500e_Luxury_HERO-1500x900.jpg",
+      side: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_07-1000x600.jpg",
+      rear: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_08-1000x600.jpg",
+      interior: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_015-1000x600.jpg",
+      cockpit: "https://pressroom.lexus.com/wp-content/uploads/2025/05/Lexus_ES500e_Luxury_013-1000x600.jpg"
+    }
+  },
+  {
+    id: "rx350h", name: "Lexus RX 350h", year: 2025, body: "SUV", type: "HEV",
+    msrp: 51425, mpg: 37, mpgLabel: "37 MPG", range: null,
+    hp: 246, hpLabel: "246", drive: "FWD / AWD",
+    screen: 14, screenLabel: '14"', acControl: "yes", volControl: "yes",
+    trunk: "Power liftgate", cargo: 29.6, seating: 5,
+    highlights: ["37 MPG combined for a midsize luxury SUV", "Lexus Safety System+ 3.0 standard", "29.6 cu ft cargo behind 2nd row"],
+    mfgUrl: "https://www.lexus.com/models/RX-hybrid",
+    images: {
+      front: "https://media.ed.edmunds-media.com/lexus/rx/2025/oem/2025_lexus_rx_4dr-suv_350-f-sport-handling_fq_oem_1_1280.jpg",
+      side: "https://media.ed.edmunds-media.com/lexus/rx/2025/oem/2025_lexus_rx_4dr-suv_350-f-sport-handling_s_oem_1_1280.jpg",
+      rear: "https://media.ed.edmunds-media.com/lexus/rx/2025/oem/2025_lexus_rx_4dr-suv_350-f-sport-handling_rq_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/lexus/rx/2025/oem/2025_lexus_rx_4dr-suv_350-f-sport-handling_d_oem_1_1280.jpg",
+      cockpit: "https://media.ed.edmunds-media.com/lexus/rx/2025/oem/2025_lexus_rx_4dr-suv_350h-luxury_d_oem_1_1280.jpg"
+    }
+  },
+  {
+    id: "rx450h", name: "Lexus RX 450h+", year: 2025, body: "SUV", type: "PHEV",
+    msrp: 72610, mpg: 83, mpgLabel: "83 MPGe / 38 MPG", range: 35,
+    hp: 304, hpLabel: "304", drive: "AWD",
+    screen: 14, screenLabel: '14"', acControl: "yes", volControl: "yes",
+    trunk: "Power liftgate", cargo: 27.2, seating: 5,
+    highlights: ["35-mile EV range for daily commutes", "304 hp — most powerful RX", "18.1 kWh battery, Level 2 ~4.5 hrs"],
+    mfgUrl: "https://www.lexus.com/models/RX-plug-in-hybrid",
+    images: {
+      front: "https://media.ed.edmunds-media.com/lexus/rx/2025/oem/2025_lexus_rx_4dr-suv_350-f-sport-handling_fq_oem_1_1280.jpg",
+      side: "https://media.ed.edmunds-media.com/lexus/rx/2025/oem/2025_lexus_rx_4dr-suv_350-f-sport-handling_s_oem_1_1280.jpg",
+      rear: "https://media.ed.edmunds-media.com/lexus/rx/2025/oem/2025_lexus_rx_4dr-suv_350-f-sport-handling_rq_oem_1_1280.jpg",
+      interior: "https://media.ed.edmunds-media.com/lexus/rx/2025/oem/2025_lexus_rx_4dr-suv_350-f-sport-handling_d_oem_1_1280.jpg",
+      cockpit: "https://media.ed.edmunds-media.com/lexus/rx/2025/oem/2025_lexus_rx_4dr-suv_350h-premium_d_oem_1_1280.jpg"
     }
   }
 ];
@@ -803,6 +892,7 @@ function render() {
         <div class="photo-wrap"><img src="${v.images.side}" alt="${v.name} side" loading="lazy" onclick="openLightbox(this.src)"><span class="photo-label">Side</span></div>
         <div class="photo-wrap"><img src="${v.images.rear}" alt="${v.name} rear" loading="lazy" onclick="openLightbox(this.src)"><span class="photo-label">Rear</span></div>
         <div class="photo-wrap"><img src="${v.images.interior}" alt="${v.name} interior" loading="lazy" onclick="openLightbox(this.src)"><span class="photo-label">Interior</span></div>
+        <div class="photo-wrap"><img src="${v.images.cockpit}" alt="${v.name} cockpit" loading="lazy" onclick="openLightbox(this.src)"><span class="photo-label">Dashboard</span></div>
       </div>
 
       <div class="specs-grid">
@@ -824,6 +914,11 @@ function render() {
       <ul class="highlights-list">
         ${v.highlights.map(h=>`<li>${h}</li>`).join("")}
       </ul>
+
+      <a class="mfg-link" href="${v.mfgUrl}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7zm-2 16H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7H12z"/></svg>
+        View on ${v.name.split(' ')[0]}.com
+      </a>
     </section>
   `).join("");
 
